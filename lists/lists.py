@@ -8,20 +8,23 @@ class ListExercise:
         :param input_list: Исходный список
         :return: Список с замененными элементами
         """
-        max: int = 0
-        result_list: list[int] = []
-        for i in input_list:
-            if i > max:
-                max = i
-        if not max:
-            return input_list
+        if len(input_list):
+            max: int = input_list[0]
         else:
-            for i in input_list:
-                if i >= 0:
-                    result_list.append(max)
-                else:
-                    result_list.append(i)
-            return result_list
+            return input_list
+
+        result_list: list[int] = []
+
+        for element in input_list[1:]:
+            if element > max:
+                max = element
+
+        for element in input_list:
+            if element >= 0:
+                result_list.append(max)
+            else:
+                result_list.append(element)
+        return result_list
 
     @staticmethod
     def search(input_list: list[int], query: int) -> int:
@@ -34,21 +37,21 @@ class ListExercise:
         :return: Номер элемента
         """
         low: int = 0
-        mid: int = len(input_list) // 2
         high: int = len(input_list) - 1
 
-        def start_search(low: int, mid: int, high: int) -> int:
+        def start_search(low: int, high: int) -> int:
             if low > high:
                 return -1
-            elif input_list[mid] == query:
+
+            mid: int = (low + high) // 2
+
+            if input_list[mid] == query:
                 return mid
-            elif input_list[mid] < query:
+            if input_list[mid] < query:
                 low = mid + 1
-                mid = (low + high) // 2
-                return start_search(low, mid, high)
+                return start_search(low, high)
             else:
                 high = mid - 1
-                mid = (low + high) // 2
-                return start_search(low, mid, high)
+                return start_search(low, high)
 
-        return start_search(low, mid, high)
+        return start_search(low, high)
