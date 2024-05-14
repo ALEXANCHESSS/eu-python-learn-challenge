@@ -43,7 +43,7 @@ class FlaskExercise:
 
         @app.get("/user/<string:name>")
         def get_user(name: str) -> Tuple[Response, int]:
-            result = FlaskExercise.get_user(name)
+            result = FlaskExercise.user_exists(name)
             if result:
                 return jsonify({"data": f"My name is {name}"}), 200
             else:
@@ -52,12 +52,9 @@ class FlaskExercise:
         @app.route("/user/<string:name>", methods=["PATCH"])
         def update_user(name: str) -> Tuple[Response, int]:
             data: dict = request.get_json()
-            if "name" in data:
-                new_name: str = data["name"]
-                FlaskExercise.update_user(name, new_name)
-                return jsonify({"data": f"My name is {new_name}"}), 200
-            else:
-                return jsonify({}), 404
+            new_name: str = data["name"]
+            FlaskExercise.update_user(name, new_name)
+            return jsonify({"data": f"My name is {new_name}"}), 200
 
         @app.delete("/user/<string:name>")
         def delete_user(name: str) -> Tuple[str, int]:
@@ -73,11 +70,8 @@ class FlaskExercise:
             cls.users[name] = {"age": age}
 
     @classmethod
-    def get_user(cls, name: str) -> bool:
-        if name in cls.users:
-            return True
-        else:
-            return False
+    def user_exists(cls, name: str) -> bool:
+        return name in cls.users
 
     @classmethod
     def update_user(cls, old_name: str, new_name: str, age: Optional[int] = None) -> None:
