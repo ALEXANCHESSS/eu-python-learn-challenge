@@ -8,10 +8,9 @@ class ListExercise:
         :param input_list: Исходный список
         :return: Список с замененными элементами
         """
-        if len(input_list):
-            max: int = input_list[0]
-        else:
-            return input_list
+        if not len(input_list):
+            return []
+        max: int = input_list[0]
 
         result_list: list[int] = []
 
