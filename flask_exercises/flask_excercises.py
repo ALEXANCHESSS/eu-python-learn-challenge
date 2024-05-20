@@ -35,19 +35,19 @@ class FlaskExercise:
         @app.post("/user")
         def create_user() -> Tuple[Response, int]:
             data: dict = request.get_json()
-            if "name" in data:
-                FlaskExercise.create_user(data["name"])
-                return jsonify({"data": f"User {data['name']} is created!"}), 201
-            else:
+            if "name" not in data:
                 return jsonify({"errors": {"name": "This field is required"}}), 422
+
+            FlaskExercise.create_user(data["name"])
+            return jsonify({"data": f"User {data['name']} is created!"}), 201
 
         @app.get("/user/<string:name>")
         def get_user(name: str) -> Tuple[Response, int]:
             result = FlaskExercise.user_exists(name)
-            if result:
-                return jsonify({"data": f"My name is {name}"}), 200
-            else:
+            if not result:
                 return jsonify({}), 404
+
+            return jsonify({"data": f"My name is {name}"}), 200
 
         @app.route("/user/<string:name>", methods=["PATCH"])
         def update_user(name: str) -> Tuple[Response, int]:
@@ -59,10 +59,10 @@ class FlaskExercise:
         @app.delete("/user/<string:name>")
         def delete_user(name: str) -> Tuple[str, int]:
             result = FlaskExercise.delete_user(name)
-            if result:
-                return "", 204
-            else:
+            if not result:
                 return "", 404
+
+            return "", 204
 
     @classmethod
     def create_user(cls, name: str, age: Optional[int] = None) -> None:
@@ -82,8 +82,8 @@ class FlaskExercise:
 
     @classmethod
     def delete_user(cls, name: str) -> bool:
-        if name in cls.users:
-            del cls.users[name]
-            return True
-        else:
+        if name not in cls.users:
             return False
+
+        del cls.users[name]
+        return True
