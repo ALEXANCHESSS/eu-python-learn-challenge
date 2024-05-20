@@ -40,7 +40,7 @@ ADD FOREIGN KEY("Location_id") REFERENCES "Locations"("id");
 1. Показать работников у которых нет почты или почта не в корпоративном домене (домен dualbootpartners.com)
 SELECT "Name" , "Last_name"
 FROM "Employees"
-WHERE "Email" IS NULL OR "Email" LIKE '%dualbootpartners.com'
+WHERE "Email" IS NULL OR "Email" NOT LIKE '%@dualbootpartners.com'
 
 2. Получить список работников нанятых в последние 30 дней
 SELECT "Name" , "Last_name"
