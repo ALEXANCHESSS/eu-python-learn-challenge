@@ -1,0 +1,72 @@
+CREATE TABLE "Employees" (
+	"id" serial PRIMARY KEY,
+	"Name" varchar,
+	"Last_name" varchar,
+	"Hire date" date,
+	"Salary" int,
+	"Email" varchar,
+	"Manager_id" int,
+	"Department_id" int
+);
+
+CREATE TABLE "Departments" (
+	"id" serial PRIMARY KEY,
+	"Name" varchar,
+	"Location_id" int,
+	"Manager_id" int
+);
+
+CREATE TABLE "Locations" (
+	"id" serial PRIMARY KEY,
+	"Address" varchar,
+	"Region_id" int
+);
+
+CREATE TABLE "Regions" (
+	"id" serial PRIMARY KEY,
+	"Name" varchar
+);
+
+ALTER TABLE "Locations"
+ADD FOREIGN KEY("Region_id") REFERENCES "Regions"("id");
+
+ALTER TABLE "Employees"
+ADD FOREIGN KEY("Department_id") REFERENCES "Departments"("id");
+
+ALTER TABLE "Departments"
+ADD FOREIGN KEY("Location_id") REFERENCES "Locations"("id");
+
+
+1. Показать работников у которых нет почты или почта не в корпоративном домене (домен dualbootpartners.com)
+SELECT "Name" , "Last_name"
+FROM "Employees"
+WHERE "Email" IS NULL OR "Email" NOT LIKE '%@dualbootpartners.com'
+
+2. Получить список работников нанятых в последние 30 дней
+SELECT "Name" , "Last_name"
+FROM "Employees"
+WHERE "Hire date" > CURRENT_DATE - 30
+
+3. Найти максимальную и минимальную зарплату по каждому департаменту
+SELECT d."Name" , MIN("Salary") as min_salary, MAX("Salary") as max_salary
+FROM "Employees" as e
+JOIN "Departments" as d ON e."Department_id" = d.id
+GROUP BY d.id
+
+4. Посчитать количество работников в каждом регионе
+SELECT r."Name" , count(e.id)
+FROM "Employees" as e
+JOIN "Departments" as d ON e."Department_id" = d.id
+JOIN "Locations" as l ON l.id =d."Location_id"
+JOIN "Regions" as r ON r.id = l."Region_id"
+GROUP BY r.id
+
+5. Показать сотрудников у которых фамилия длиннее 10 символов
+SELECT "Name", "Last_name"
+FROM "Employees"
+WHERE LENGTH("Last_name") > 10
+
+6. Показать сотрудников с зарплатой выше средней по всей компании
+SELECT "Name", "Last_name"
+FROM "Employees"
+WHERE "Salary" > (SELECT AVG("Salary") FROM "Employees")
