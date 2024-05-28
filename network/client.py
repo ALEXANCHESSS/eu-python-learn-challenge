@@ -8,23 +8,23 @@ PORT = 12345
 lock = threading.Lock()
 
 
-def connection_wrapper(connection: socket.socket, name_user) -> None:
+def connection_wrapper(connection: socket.socket, name_user: str) -> None:
     while True:
         try:
             data = connection.recv(1024)
             if not data:
                 break
 
-            with lock:
-                sys.stdout.write('\r' + ' ' * len(name_user) + '\r')
-                print(data.decode('utf-8'))
-                sys.stdout.write(f'{name_user}: ')
-                sys.stdout.flush()
-        except ConnectionResetError:
-            print('Connection error')
+            sys.stdout.write('\r' + ' ' * len(name_user) + '\r')
+            print(data.decode('utf-8'))
+            sys.stdout.write(f'{name_user}: ')
+            sys.stdout.flush()
+        except ConnectionResetError as e:
+            print(f'Connection error: {e}')
+            break
 
 
-def writer(connection: socket.socket, name_user) -> None:
+def writer(connection: socket.socket, name_user: str) -> None:
     while True:
         data = input(f'{name_user}: ')
         if data == ':q':
@@ -47,4 +47,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     writing_thread.start()
 
     connection_thread.join()
-    writing_thread.join()

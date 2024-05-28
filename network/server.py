@@ -1,13 +1,16 @@
 import socket
 import threading
+import logging
 
 HOST = "127.0.0.1"
 PORT = 12345
 clients = set()
 lock = threading.Lock()
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-def new_client(connection: socket.socket, addr) -> None:
+
+def new_client(connection: socket.socket, addr: tuple[str, int]) -> None:
     with connection:
         with lock:
             clients.add(connection)
@@ -16,7 +19,7 @@ def new_client(connection: socket.socket, addr) -> None:
                 data = connection.recv(1024)
                 if not data:
                     break
-                print(f"|{data.decode('utf-8')}| from {addr}")
+                logging.info(f"|{data.decode('utf-8')}| from {addr}")
                 with lock:
                     for client in clients:
                         if client != connection:
@@ -24,8 +27,10 @@ def new_client(connection: socket.socket, addr) -> None:
             with lock:
                 clients.remove(connection)
 
-        except ConnectionResetError:
-            print('Connection error')
+        except ConnectionResetError as e:
+            logging.error(f'Connection error {e}')
+            with lock:
+                clients.remove(connection)
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
